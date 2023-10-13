@@ -8,9 +8,10 @@ function addFactorInput() {
     const factorDiv = document.createElement('div');
     factorDiv.className = 'factor';
     factorDiv.innerHTML = `
-        <label>Factor ${factorCount}:</label>
+        <label>Factor ${factorCount} Name:</label>
         <input type="text" placeholder="Factor Name">
-        <input type="number" placeholder="Number of Levels" min="2">
+        <label>Levels:</label>
+        <input type="text" placeholder="e.g. 1,2,4 or H,M,L">
     `;
     document.getElementById('factors-container').appendChild(factorDiv);
 }
@@ -22,12 +23,18 @@ function generateArray() {
         existingArray.remove();
     }
 
-    const factors = document.querySelectorAll('.factor');
+    const factors = Array.from(document.querySelectorAll('.factor')).map(factor => {
+        return {
+            name: factor.querySelector('input[type="text"]').value,
+            levels: factor.querySelector('input[type="text"]:nth-child(3)').value.split(',')
+        };
+    });
+
     const arrayDiv = document.createElement('div');
     arrayDiv.id = 'array-display';
     let tableHeaders = '<th>Experiment</th>';
-    factors.forEach((_, index) => {
-        tableHeaders += `<th>Factor ${index + 1}</th>`;
+    factors.forEach(factor => {
+        tableHeaders += `<th>${factor.name}</th>`;
     });
     tableHeaders += '<th>Result</th>';
 
@@ -47,7 +54,7 @@ function generateArray() {
     `;
     document.querySelector('.container').appendChild(arrayDiv);
 
-    // Basic L8 array for 2-level factors
+    // Basic L8 array for 2-level factors (placeholder, can be expanded for more complex arrays)
     const l8Array = [
         [1, 1, 1],
         [1, 2, 2],
@@ -63,8 +70,8 @@ function generateArray() {
     l8Array.forEach((rowValues, rowIndex) => {
         const row = document.createElement('tr');
         let rowData = `<td>Experiment ${rowIndex + 1}</td>`;
-        rowValues.slice(0, factors.length).forEach(value => {
-            rowData += `<td>${value}</td>`;
+        rowValues.forEach((value, index) => {
+            rowData += `<td>${factors[index].levels[value - 1]}</td>`;
         });
         rowData += '<td><input type="number" placeholder="Enter Result"></td>';
         row.innerHTML = rowData;
@@ -75,42 +82,45 @@ function generateArray() {
 }
 
 function analyzeResults() {
-    const factors = document.querySelectorAll('.factor');
+    const factors = Array.from(document.querySelectorAll('.factor')).map(factor => {
+        return {
+            name: factor.querySelector('input[type="text"]').value,
+            levels: factor.querySelector('input[type="text"]:nth-child(3)').value.split(',')
+        };
+    });
     const rows = document.querySelectorAll('#array-display tbody tr');
     let averages = {};
     let counts = {};
 
-    factors.forEach((_, index) => {
-        const factorName = `factor${index + 1}`;
-        averages[factorName] = [0, 0];
-        counts[factorName] = [0, 0];
+    factors.forEach(factor => {
+        averages[factor.name] = factor.levels.map(() => 0);
+        counts[factor.name] = factor.levels.map(() => 0);
     });
 
     rows.forEach(row => {
         const cells = row.querySelectorAll('td');
         const result = parseFloat(cells[cells.length - 1].querySelector('input').value);
 
-        factors.forEach((_, index) => {
-            const factorName = `factor${index + 1}`;
-            const level = parseInt(cells[index + 1].textContent) - 1; // 0-based index
-            averages[factorName][level] += result;
-            counts[factorName][level]++;
+        factors.forEach((factor, index) => {
+            const levelIndex = factor.levels.indexOf(cells[index + 1].textContent);
+            averages[factor.name][levelIndex] += result;
+            counts[factor.name][levelIndex]++;
         });
     });
 
-    Object.keys(averages).forEach(factor => {
-        averages[factor][0] /= counts[factor][0];
-        averages[factor][1] /= counts[factor][1];
+    Object.keys(averages).forEach(factorName => {
+        averages[factorName] = averages[factorName].map((sum, index) => sum / counts[factorName][index]);
     });
 
     const conclusionsDiv = document.createElement('div');
     conclusionsDiv.id = 'conclusions';
     let conclusionsContent = '<h2>Basic Analysis</h2>';
-    Object.keys(averages).forEach(factor => {
-        conclusionsContent += `
-            <p>Average result for ${factor}, Level 1: ${averages[factor][0].toFixed(2)}</p>
-            <p>Average result for ${factor}, Level 2: ${averages[factor][1].toFixed(2)}</p>
-        `;
+    Object.keys(averages).forEach(factorName => {
+        factors.find(factor => factor.name === factorName).levels.forEach((level, index) => {
+            conclusionsContent += `
+                <p>Average result for ${factorName}, Level ${level}: ${averages[factorName][index].toFixed(2)}</p>
+            `;
+        });
     });
     conclusionsDiv.innerHTML = conclusionsContent;
     document.querySelector('.container').appendChild(conclusionsDiv);
