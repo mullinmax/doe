@@ -23,7 +23,7 @@ async function generateAndDisplayArray() {
     await loadPyodideAndPackages();
 
     // Run the Python code using Pyodide
-    const resultFromPython = pyodide.runPython(`gsd(${JSON.stringify(factors)})`);
+    const resultFromPython = pyodideInstance.runPython(`gsd(${JSON.stringify(factors)})`);
 
     // Display the result in a table
     displayArrayInTable(resultFromPython.toJs());
