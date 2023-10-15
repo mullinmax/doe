@@ -102,6 +102,9 @@ function displayArrayInTable(array) {
         </table>
     `;
     document.querySelector('.container').appendChild(arrayDiv);
+
+    document.getElementById('add-measurement-btn').style.display = 'block';
+
 }
 
 function addMeasurementColumn() {
@@ -145,6 +148,10 @@ async function loadPyodideAndPackages() {
     await pyodideInstance.loadPackage(['numpy']);
     const pythonCode = await fetch('https://mullinmax.github.io/doe/src/gsd.py').then(resp => resp.text());
     pyodideInstance.runPython(pythonCode);
+    
+    const generateArrayButton = document.getElementById('generate-array-btn');
+    generateArrayButton.disabled = false;
+
 }
 
 // Load Pyodide on page load

@@ -43,21 +43,40 @@ button {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-right: 10px; /* Added for spacing between buttons */
 }
 
 button:hover {
     background-color: #0056b3;
 }
 
+button:disabled {
+    background-color: #b3c2d1; /* Grayed out color for disabled button */
+    cursor: not-allowed;
+}
+
 .factor {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
 }
 
-input[type="text"], input[type="number"] {
+.factor label {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.factor input {
+    flex: 2;
+}
+
+input[type="text"], input[type="number"], input[type="range"] {
     padding: 10px;
     margin-right: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    width: 100%; /* Ensures full width for better responsiveness */
 }
 
 table {
