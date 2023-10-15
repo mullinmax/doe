@@ -1,3 +1,14 @@
+// Ensure Pyodide is loaded on page load
+loadPyodideAndPackages();
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('add-factor-btn').addEventListener('click', addFactorInput);
+    document.getElementById('generate-array-btn').addEventListener('click', generateAndDisplayArray);
+    document.getElementById('reduction').addEventListener('input', updateEstimatedRows);
+    updateEstimatedRows();
+});
+
+
 document.getElementById('add-factor-btn').addEventListener('click', addFactorInput);
 document.getElementById('generate-array-btn').addEventListener('click', generateAndDisplayArray);
 
@@ -153,6 +164,3 @@ async function loadPyodideAndPackages() {
     generateArrayButton.disabled = false;
 
 }
-
-// Load Pyodide on page load
-window.addEventListener('load', loadPyodideAndPackages);
