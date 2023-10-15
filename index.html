@@ -12,14 +12,17 @@
     <div class="container">
         <h1>Design Your Experiment</h1>
         <section id="input-section">
+
             <h2>Input Factors and Levels</h2>
+            
+            <label for="reduction">Reduction Factor:</label>
+            <input type="range" id="reduction" value="2" min="2" max="100" oninput="updateEstimatedRows()">
+            <span id="reductionValue">2</span>
+            <p id="estimatedRows">Estimated Rows: </p>
+
             <div id="factors-container">
                 <!-- Factors will be added here dynamically -->
             </div>
-            
-            <label for="reduction">Reduction Factor:</label>
-            <input type="number" id="reduction" value="1" min="1" oninput="updateEstimatedRows()">
-            <p id="estimatedRows">Estimated Rows: </p>
 
             <button id="add-factor-btn">Add Factor</button>
             <button id="generate-array-btn">Generate Array</button>

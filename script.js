@@ -19,11 +19,21 @@ function updateEstimatedRows() {
         return factor.querySelector('input[type="text"]').value.split(',').length;
     });
     const totalFactorial = factors.reduce((acc, val) => acc * val, 1);
-    const reduction = parseInt(document.getElementById('reduction').value, 10);
+    const reductionSlider = document.getElementById('reduction');
+    const reduction = parseInt(reductionSlider.value, 10);
     const estimatedRows = Math.ceil(totalFactorial / reduction);
+
+    // Adjust the slider's maximum value based on the constraints
+    while (estimatedRows <= factors.length && reductionSlider.max > 2) {
+        reductionSlider.max = reductionSlider.max - 1;
+        reductionSlider.value = reductionSlider.max;
+        updateEstimatedRows();
+        return;
+    }
+
+    document.getElementById('reductionValue').textContent = reductionSlider.value;
     document.getElementById('estimatedRows').textContent = `Estimated Rows: ${estimatedRows}`;
 }
-
 
 async function generateAndDisplayArray() {
     const factors = Array.from(document.querySelectorAll('.factor')).map(factor => {
