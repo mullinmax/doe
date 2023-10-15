@@ -1,4 +1,21 @@
 // Ensure Pyodide is loaded on page load
+let pyodideInstance = null;
+
+async function loadPyodideAndPackages() {
+    if (pyodideInstance) {
+        return;
+    }
+
+    pyodideInstance = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/" });
+    await pyodideInstance.loadPackage(['numpy']);
+    const pythonCode = await fetch('https://mullinmax.github.io/doe/src/gsd.py').then(resp => resp.text());
+    pyodideInstance.runPython(pythonCode);
+    
+    const generateArrayButton = document.getElementById('generate-array-btn');
+    generateArrayButton.disabled = false;
+
+}
+
 loadPyodideAndPackages();
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -145,22 +162,4 @@ function addMeasurementColumn() {
         cell.appendChild(input);
         row.appendChild(cell);
     });
-}
-
-
-let pyodideInstance = null;
-
-async function loadPyodideAndPackages() {
-    if (pyodideInstance) {
-        return;
-    }
-
-    pyodideInstance = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/" });
-    await pyodideInstance.loadPackage(['numpy']);
-    const pythonCode = await fetch('https://mullinmax.github.io/doe/src/gsd.py').then(resp => resp.text());
-    pyodideInstance.runPython(pythonCode);
-    
-    const generateArrayButton = document.getElementById('generate-array-btn');
-    generateArrayButton.disabled = false;
-
 }
