@@ -8,15 +8,17 @@ function addFactorInput() {
     const factorDiv = document.createElement('div');
     factorDiv.className = 'factor';
     factorDiv.innerHTML = `
-        <label>Factor ${factorCount} Levels (comma separated):</label>
-        <input type="text" placeholder="e.g. 1,2,4 or H,M,L">
+        <label for="factorName${factorCount}">Factor Name:</label>
+        <input type="text" id="factorName${factorCount}" placeholder="Factor ${factorCount}">
+        <label for="factorValues${factorCount}">Values:</label>
+        <input type="text" id="factorValues${factorCount}" placeholder="e.g. 1,2,4 or H,M,L">
     `;
     document.getElementById('factors-container').appendChild(factorDiv);
 }
 
 function updateEstimatedRows() {
     const factors = Array.from(document.querySelectorAll('.factor')).map(factor => {
-        return factor.querySelector('input[type="text"]').value.split(',').length;
+        return factor.querySelector('input[type="text"]:last-child').value.split(',').length;
     });
     const totalFactorial = factors.reduce((acc, val) => acc * val, 1);
     const reductionSlider = document.getElementById('reduction');
@@ -24,7 +26,7 @@ function updateEstimatedRows() {
     const estimatedRows = Math.ceil(totalFactorial / reduction);
 
     // Adjust the slider's maximum value based on the constraints
-    while (estimatedRows <= factors.length && reductionSlider.max > 2) {
+    while (estimatedRows <= 2 * factors.length && reductionSlider.max > 2) {
         reductionSlider.max = reductionSlider.max - 1;
         reductionSlider.value = reductionSlider.max;
         updateEstimatedRows();
@@ -37,7 +39,7 @@ function updateEstimatedRows() {
 
 async function generateAndDisplayArray() {
     const factors = Array.from(document.querySelectorAll('.factor')).map(factor => {
-        return factor.querySelector('input[type="text"]').value.split(',').length;
+        return factor.querySelector('input[type="text"]:last-child').value.split(',').length;
     });
     const reduction = parseInt(document.getElementById('reduction').value, 10);
 
@@ -51,7 +53,6 @@ async function generateAndDisplayArray() {
     displayArrayInTable(resultFromPython.toJs());
 }
 
-
 function displayArrayInTable(array) {
     // Clear any existing array
     const existingArray = document.getElementById('array-display');
@@ -62,9 +63,10 @@ function displayArrayInTable(array) {
     const arrayDiv = document.createElement('div');
     arrayDiv.id = 'array-display';
     let tableHeaders = '<th>Experiment</th>';
-    for (let i = 1; i <= factorCount; i++) {
-        tableHeaders += `<th>Factor ${i}</th>`;
-    }
+    Array.from(document.querySelectorAll('.factor')).forEach((factor, index) => {
+        const factorNameInput = factor.querySelector('input[type="text"]:first-child');
+        tableHeaders += `<th>${factorNameInput.value || `Factor ${index + 1}`}</th>`;
+    });
 
     let tableRows = '';
     array.forEach((row, rowIndex) => {
@@ -90,6 +92,27 @@ function displayArrayInTable(array) {
     `;
     document.querySelector('.container').appendChild(arrayDiv);
 }
+
+function addMeasurementColumn() {
+    const table = document.querySelector('#array-display table');
+    const header = table.querySelector('thead tr');
+    const th = document.createElement('th');
+    th.textContent = 'Measurement';
+    header.appendChild(th);
+
+    const rows = table.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        const td = document.createElement('td');
+        const input = document.createElement('input');
+        input.type = 'number';
+        td.appendChild(input);
+        row.appendChild(td);
+    });
+}
+
+window.addEventListener('load', async () => {
+    await loadPyodideAndPackages();
+});
 
 let pyodideInstance = null;
 
