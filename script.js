@@ -63,10 +63,11 @@ function displayArrayInTable(array) {
     const arrayDiv = document.createElement('div');
     arrayDiv.id = 'array-display';
     let tableHeaders = '<th>Experiment</th>';
-    Array.from(document.querySelectorAll('.factor')).forEach((factor, index) => {
-        const factorNameInput = factor.querySelector('input[type="text"]:first-child');
-        tableHeaders += `<th>${factorNameInput.value || `Factor ${index + 1}`}</th>`;
-    });
+    for (let i = 1; i <= factorCount; i++) {
+        const factorNameInput = document.querySelector(`#factor-name-${i}`);
+        const factorName = factorNameInput ? factorNameInput.value : `Factor ${i}`;
+        tableHeaders += `<th>${factorName}</th>`;
+    }
 
     let tableRows = '';
     array.forEach((row, rowIndex) => {
