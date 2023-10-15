@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function() {
     loadPythonCode();
 
     function loadPythonCode() {
-        fetch('src/gsd.py')
+        fetch('https://mullinmax.github.io/doe/src/gsd.py')
         .then(response => response.text())
         .then(data => {
             document.getElementById('dynamic-python').textContent = data;
