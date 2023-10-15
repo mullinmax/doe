@@ -19,7 +19,7 @@ function addFactorInput() {
 
 function updateEstimatedRows() {
     const factors = Array.from(document.querySelectorAll('.factor')).map(factor => {
-        return factor.querySelector('input[type="text"]:last-child').value.split(',').length;
+        return factor.querySelector('input[type="text"]').value.split(',').length;
     });
     const totalFactorial = factors.reduce((acc, val) => acc * val, 1);
     const reductionSlider = document.getElementById('reduction');
@@ -27,7 +27,7 @@ function updateEstimatedRows() {
     const estimatedRows = Math.ceil(totalFactorial / reduction);
 
     // Adjust the slider's maximum value based on the constraints
-    while (estimatedRows <= 2 * factors.length && reductionSlider.max > 2) {
+    while (estimatedRows <= factors.length && reductionSlider.max > 2) {
         reductionSlider.max = reductionSlider.max - 1;
         reductionSlider.value = reductionSlider.max;
         updateEstimatedRows();
@@ -39,6 +39,11 @@ function updateEstimatedRows() {
 }
 
 async function generateAndDisplayArray() {
+    const factors = Array.from(document.querySelectorAll('.factor')).map(factor => {
+        return factor.querySelector('input[id^="factor-levels-"]').value.split(',').length;
+    });
+    const reduction = parseInt(document.getElementById('reduction').value, 10);
+
     // Store factor names and levels
     for (let i = 1; i <= factorCount; i++) {
         const factorName = document.getElementById(`factor-name-${i}`).value;
@@ -48,7 +53,6 @@ async function generateAndDisplayArray() {
             levels: factorLevels
         };
     }
-    const reduction = parseInt(document.getElementById('reduction').value, 10);
 
     // Load Pyodide and Python packages
     await loadPyodideAndPackages();
@@ -71,9 +75,7 @@ function displayArrayInTable(array) {
     arrayDiv.id = 'array-display';
     let tableHeaders = '<th>Experiment</th>';
     for (let i = 1; i <= factorCount; i++) {
-        const factorNameInput = document.querySelector(`#factor-name-${i}`);
-        const factorName = factorNameInput ? factorNameInput.value : `Factor ${i}`;
-        tableHeaders += `<th>${factorName}</th>`;
+        tableHeaders += `<th>${factorData[`factor${i}`].name}</th>`;
     }
 
     let tableRows = '';
@@ -102,27 +104,6 @@ function displayArrayInTable(array) {
     document.querySelector('.container').appendChild(arrayDiv);
 }
 
-function addMeasurementColumn() {
-    const table = document.querySelector('#array-display table');
-    const header = table.querySelector('thead tr');
-    const th = document.createElement('th');
-    th.textContent = 'Measurement';
-    header.appendChild(th);
-
-    const rows = table.querySelectorAll('tbody tr');
-    rows.forEach(row => {
-        const td = document.createElement('td');
-        const input = document.createElement('input');
-        input.type = 'number';
-        td.appendChild(input);
-        row.appendChild(td);
-    });
-}
-
-window.addEventListener('load', async () => {
-    await loadPyodideAndPackages();
-});
-
 let pyodideInstance = null;
 
 async function loadPyodideAndPackages() {
@@ -135,3 +116,6 @@ async function loadPyodideAndPackages() {
     const pythonCode = await fetch('https://mullinmax.github.io/doe/src/gsd.py').then(resp => resp.text());
     pyodideInstance.runPython(pythonCode);
 }
+
+// Load Pyodide on page load
+window.addEventListener('load', loadPyodideAndPackages);
