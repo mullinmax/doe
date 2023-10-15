@@ -16,6 +16,11 @@
             <div id="factors-container">
                 <!-- Factors will be added here dynamically -->
             </div>
+            
+            <label for="reduction">Reduction Factor:</label>
+            <input type="number" id="reduction" value="1" min="1" oninput="updateEstimatedRows()">
+            <p id="estimatedRows">Estimated Rows: </p>
+
             <button id="add-factor-btn">Add Factor</button>
             <button id="generate-array-btn">Generate Array</button>
         </section>

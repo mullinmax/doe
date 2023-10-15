@@ -14,20 +14,33 @@ function addFactorInput() {
     document.getElementById('factors-container').appendChild(factorDiv);
 }
 
+function updateEstimatedRows() {
+    const factors = Array.from(document.querySelectorAll('.factor')).map(factor => {
+        return factor.querySelector('input[type="text"]').value.split(',').length;
+    });
+    const totalFactorial = factors.reduce((acc, val) => acc * val, 1);
+    const reduction = parseInt(document.getElementById('reduction').value, 10);
+    const estimatedRows = Math.ceil(totalFactorial / reduction);
+    document.getElementById('estimatedRows').textContent = `Estimated Rows: ${estimatedRows}`;
+}
+
+
 async function generateAndDisplayArray() {
     const factors = Array.from(document.querySelectorAll('.factor')).map(factor => {
         return factor.querySelector('input[type="text"]').value.split(',').length;
     });
+    const reduction = parseInt(document.getElementById('reduction').value, 10);
 
     // Load Pyodide and Python packages
     await loadPyodideAndPackages();
 
     // Run the Python code using Pyodide
-    const resultFromPython = pyodideInstance.runPython(`gsd(${JSON.stringify(factors)})`);
+    const resultFromPython = pyodideInstance.runPython(`gsd(${JSON.stringify(factors)}, ${reduction})`);
 
     // Display the result in a table
     displayArrayInTable(resultFromPython.toJs());
 }
+
 
 function displayArrayInTable(array) {
     // Clear any existing array
