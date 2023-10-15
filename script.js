@@ -76,9 +76,16 @@ async function loadPyodideAndPackages() {
     }
 
     await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.18.1/full/" });
+
+    // Check if Pyodide is defined
+    if (typeof pyodide === 'undefined') {
+        throw new Error("Pyodide failed to load properly.");
+    }
+
     await pyodide.loadPackage(['numpy']);
     const pythonCode = await fetch('https://mullinmax.github.io/doe/src/gsd.py').then(resp => resp.text());
     pyodide.runPython(pythonCode);
 
     pyodideLoaded = true;
 }
+
