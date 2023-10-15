@@ -68,13 +68,17 @@ function displayArrayInTable(array) {
     document.querySelector('.container').appendChild(arrayDiv);
 }
 
+let pyodideLoaded = false;
+
 async function loadPyodideAndPackages() {
-    if (window.pyodide) {
+    if (pyodideLoaded) {
         return;
     }
-    
+
     await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.18.1/full/" });
     await pyodide.loadPackage(['numpy']);
     const pythonCode = await fetch('https://mullinmax.github.io/doe/src/gsd.py').then(resp => resp.text());
     pyodide.runPython(pythonCode);
+
+    pyodideLoaded = true;
 }
