@@ -80,7 +80,7 @@ function displayArrayInTable(array) {
 
     let tableRows = '';
     array.forEach((row, rowIndex) => {
-        let rowData = `<td>Experiment ${rowIndex + 1}</td>`;
+        let rowData = `<td>#${rowIndex + 1}</td>`;
         row.forEach((value, colIndex) => {
             const factorLevels = factorData[`factor${colIndex + 1}`].levels;
             rowData += `<td>${factorLevels[value]}</td>`;
@@ -103,6 +103,36 @@ function displayArrayInTable(array) {
     `;
     document.querySelector('.container').appendChild(arrayDiv);
 }
+
+function addMeasurementColumn() {
+    const arrayDisplay = document.getElementById('array-display');
+    if (!arrayDisplay) {
+        alert('Please generate the array first.');
+        return;
+    }
+
+    const columnName = prompt('Enter the name for the measurement column:');
+    if (!columnName) {
+        return;
+    }
+
+    // Add header
+    const tableHeader = arrayDisplay.querySelector('thead tr');
+    const headerCell = document.createElement('th');
+    headerCell.textContent = columnName;
+    tableHeader.appendChild(headerCell);
+
+    // Add input cells to each row
+    const tableRows = arrayDisplay.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+        const cell = document.createElement('td');
+        const input = document.createElement('input');
+        input.type = 'number';
+        cell.appendChild(input);
+        row.appendChild(cell);
+    });
+}
+
 
 let pyodideInstance = null;
 
