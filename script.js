@@ -2,16 +2,17 @@ document.getElementById('add-factor-btn').addEventListener('click', addFactorInp
 document.getElementById('generate-array-btn').addEventListener('click', generateAndDisplayArray);
 
 let factorCount = 0;
+let factorData = {};  // Store factor names and levels
 
 function addFactorInput() {
     factorCount++;
     const factorDiv = document.createElement('div');
     factorDiv.className = 'factor';
     factorDiv.innerHTML = `
-        <label for="factorName${factorCount}">Factor Name:</label>
-        <input type="text" id="factorName${factorCount}" placeholder="Factor ${factorCount}">
-        <label for="factorValues${factorCount}">Values:</label>
-        <input type="text" id="factorValues${factorCount}" placeholder="e.g. 1,2,4 or H,M,L">
+        <label>Factor ${factorCount} Name:</label>
+        <input type="text" id="factor-name-${factorCount}" placeholder="e.g. Temperature">
+        <label>Factor ${factorCount} Levels (comma separated):</label>
+        <input type="text" id="factor-levels-${factorCount}" placeholder="e.g. H,M,L">
     `;
     document.getElementById('factors-container').appendChild(factorDiv);
 }
@@ -38,9 +39,15 @@ function updateEstimatedRows() {
 }
 
 async function generateAndDisplayArray() {
-    const factors = Array.from(document.querySelectorAll('.factor')).map(factor => {
-        return factor.querySelector('input[type="text"]:last-child').value.split(',').length;
-    });
+    // Store factor names and levels
+    for (let i = 1; i <= factorCount; i++) {
+        const factorName = document.getElementById(`factor-name-${i}`).value;
+        const factorLevels = document.getElementById(`factor-levels-${i}`).value.split(',');
+        factorData[`factor${i}`] = {
+            name: factorName,
+            levels: factorLevels
+        };
+    }
     const reduction = parseInt(document.getElementById('reduction').value, 10);
 
     // Load Pyodide and Python packages
@@ -72,8 +79,9 @@ function displayArrayInTable(array) {
     let tableRows = '';
     array.forEach((row, rowIndex) => {
         let rowData = `<td>Experiment ${rowIndex + 1}</td>`;
-        row.forEach(value => {
-            rowData += `<td>${value}</td>`;
+        row.forEach((value, colIndex) => {
+            const factorLevels = factorData[`factor${colIndex + 1}`].levels;
+            rowData += `<td>${factorLevels[value]}</td>`;
         });
         tableRows += `<tr>${rowData}</tr>`;
     });
