@@ -75,11 +75,14 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(response => response.text())
         .then(data => {
             document.getElementById('dynamic-python').textContent = data;
-            // Initialize Brython after loading the Python code
-            brython();
+            // Delay Brython initialization
+            setTimeout(() => {
+                brython();
+            }, 1000);
         })
         .catch(error => {
             console.error("Error loading Python code:", error);
         });
     }
+    
 });
